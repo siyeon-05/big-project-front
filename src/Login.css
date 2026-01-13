@@ -80,11 +80,6 @@ body {
   align-self: end;
 }
 
-.hero-copy.subtle {
-  font-size: 18px;
-  letter-spacing: 0.01em;
-  color: rgba(255, 255, 255, 0.7);
-}
 .login-shell > .login-panel {
   margin-top: auto;
   margin-bottom: auto;
@@ -256,4 +251,121 @@ input:focus {
     flex-direction: column;
     align-items: flex-start;
   }
+}
+
+.feature-marquee {
+  position: relative;
+  overflow: hidden;
+  margin-top: 18px;
+  padding: 8px 0;
+}
+
+/* 좌우 페이드(고급 느낌) */
+.feature-marquee::before,
+.feature-marquee::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 90px;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+.feature-marquee::before {
+  left: 0;
+  background: linear-gradient(90deg, rgba(0,31,102,1), rgba(0,31,102,0));
+}
+.feature-marquee::after {
+  right: 0;
+  background: linear-gradient(270deg, rgba(0,31,102,1), rgba(0,31,102,0));
+}
+
+/* 트랙: 가로로 쭉 나열 + 애니메이션 */
+.marquee-track {
+  display: flex;
+  gap: 12px;
+  width: max-content;
+  animation: marquee 18s linear infinite;
+  will-change: transform;
+}
+
+/* 칩 스타일 */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  font-weight: 600;
+  backdrop-filter: blur(6px);
+}
+
+/* 왼쪽으로 흐르게 */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* 마우스 올리면 멈춤(원하면) */
+.feature-marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* 모션 민감 사용자 배려 */
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation: none; }
+}
+
+.hero-footer {
+  margin-top: auto;               /* 아래로 붙이기 */
+  padding-top: 18px;
+  color: rgba(255,255,255,0.65);
+  font-size: 11px;
+}
+
+/* 개인정보/이용약관: 텍스트 버튼 */
+.hero-footer-links {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.hero-footer-link {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.88);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.hero-footer-link:hover {
+  color: rgba(255,255,255,1);
+}
+
+.hero-footer-sep {
+  color: rgba(255,255,255,0.35);
+}
+
+/* 회사정보 텍스트 */
+.hero-footer-text {
+  line-height: 1.6;
+  color: rgba(255,255,255,0.55);
+}
+
+.hero-footer-text strong {
+  color: rgba(255,255,255,0.9);
+}
+
+.hero-footer-copy {
+  margin-top: 6px;
+  color: rgba(255,255,255,0.45);
 }

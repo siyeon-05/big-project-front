@@ -5,15 +5,41 @@ export default function LoginApp() {
         <section className="login-hero navy-panel">
           <div className="hero-top">
             <span className="hero-title-line">여러분의 새로운 시작</span>
-            <span className="hero-title-line">BrandPliot이 함께 합니다.</span>
+            <span className="hero-title-line">BRANDPILOT이 함께 합니다.</span>
           </div>
-          <p className="hero-copy subtle">
-            가장 완벽한 분석으로
-            <br />
-            귀하의 비즈니스 가치를
-            <br />
-            증명하세요.
-          </p>
+          <div className="feature-marquee" aria-label="서비스 핵심 기능">
+            <div className="marquee-track">
+              <span className="chip">AI 브랜드 진단 리포트</span>
+              <span className="chip">인터뷰 인사이트 요약</span>
+              <span className="chip">브랜드 키트 자동 생성</span>
+              <span className="chip">네이밍·로고 추천</span>
+              <span className="chip">홈페이지 템플릿 제작</span>
+              <span className="chip">사업계획서·IR 초안</span>
+
+              {/* 끊김 방지: 동일 문구 반복 */}
+              <span className="chip">AI 브랜드 진단 리포트</span>
+              <span className="chip">인터뷰 인사이트 요약</span>
+              <span className="chip">브랜드 키트 자동 생성</span>
+              <span className="chip">네이밍·로고 추천</span>
+              <span className="chip">홈페이지 템플릿 제작</span>
+              <span className="chip">사업계획서·IR 초안</span>
+            </div>
+          </div>
+          <footer className="hero-footer">
+            <div className="hero-footer-links">
+              <button type="button" className="hero-footer-link">개인정보 처리방침</button>
+              <span className="hero-footer-sep">|</span>
+              <button type="button" className="hero-footer-link">이용약관</button>
+            </div>
+
+            <div className="hero-footer-text">
+              <div><strong>BRANDPILOT</strong></div>
+              <div>BRANDPILOT | 대전광역시 서구 문정로48번길 30 (탄방동, KT타워)</div>
+              <div>KT AIVLE 7반 15조 </div>
+              <div className="hero-footer-copy">© 2026 Team15 Corp. All rights reserved.</div>
+            </div>
+
+          </footer>
         </section>
 
         <section className="login-panel light-panel">
@@ -47,7 +73,7 @@ export default function LoginApp() {
               <div className="signup-copy">
                 회원가입하고 <strong>BrandPliot</strong>의
                 <br></br>
-                <strong>더 많은 인사이트</strong>를 얻어보세요!
+                <strong>더 많은 컨설팅</strong>를 받아보세요!
               </div>
               <button type="button" className="signup-cta">
                 회원가입

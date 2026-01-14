@@ -4,10 +4,12 @@ import LoginApp from "./pages/Login.jsx";
 import SignupApp from "./pages/Signup.jsx";
 import FindID from "./pages/FindID.jsx";
 import FindPassword from "./pages/FindPassword.jsx";
+import MainPage from "./pages/MainPage.jsx";
 import "./styles/Login.css";
 import "./styles/Signup.css";
 import "./styles/FindID.css";
 import "./styles/FindPassword.css";
+import "./styles/MainPage.css";
 
 function App() {
   const [view, setView] = useState("login");
@@ -24,11 +26,16 @@ function App() {
     return <FindPassword onBack={() => setView("login")} />;
   }
 
+  if (view === "main") {
+    return <MainPage onLogout={() => setView("login")} />;
+  }
+
   return (
     <LoginApp
       onSignup={() => setView("signup")}
       onFindId={() => setView("findid")}
       onFindPw={() => setView("findpw")}
+      onLogin={() => setView("main")}
     />
   );
 }

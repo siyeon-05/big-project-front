@@ -1,11 +1,10 @@
-import namingLogoImg from "./login_image/네이밍_로고_추천.png";
-import analyzeCompany from "./login_image/기업 초기 진단.png"
-import analyzeReport from "./login_image/진단분석리포트.png"
-import makeset from "./login_image/문서초안생성.png"
-import story from "./login_image/스토리텔링.png"
+﻿import namingLogoImg from "./login_image/네이밍_로고_추천.png";
+import analyzeCompany from "./login_image/기업 초기 진단.png";
+import analyzeReport from "./login_image/진단분석리포트.png";
+import makeset from "./login_image/문서초안생성.png";
+import story from "./login_image/스토리텔링.png";
 
-
-export default function LoginApp({ onSignup }) {
+export default function LoginApp({ onSignup, onFindId, onFindPw }) {
   return (
     <div className="login-page navy">
       <div className="login-shell split">
@@ -76,24 +75,32 @@ export default function LoginApp({ onSignup }) {
                 <strong>스타트업 스토리텔링</strong>
                 <p>기업 관련 소개글 등 기업관련 홍보글을 생성해줍니다.</p>
               </div>
-              
             </div>
           </div>
 
           <footer className="hero-footer">
             <div className="hero-footer-links">
-              <button type="button" className="hero-footer-link">개인정보 처리방침</button>
+              <button type="button" className="hero-footer-link">
+                개인정보 처리방침
+              </button>
               <span className="hero-footer-sep">|</span>
-              <button type="button" className="hero-footer-link">이용약관</button>
+              <button type="button" className="hero-footer-link">
+                이용약관
+              </button>
             </div>
 
             <div className="hero-footer-text">
-              <div><strong>BRANDPILOT</strong></div>
-              <div>BRANDPILOT | 대전광역시 서구 문정로48번길 30 (탄방동, KT타워)</div>
+              <div>
+                <strong>BRANDPILOT</strong>
+              </div>
+              <div>
+                BRANDPILOT | 대전광역시 서구 문정로48번길 30 (탄방동, KT타워)
+              </div>
               <div>KT AIVLE 7반 15조 </div>
-              <div className="hero-footer-copy">© 2026 Team15 Corp. All rights reserved.</div>
+              <div className="hero-footer-copy">
+                © 2026 Team15 Corp. All rights reserved.
+              </div>
             </div>
-
           </footer>
         </section>
 
@@ -113,9 +120,13 @@ export default function LoginApp({ onSignup }) {
               />
             </div>
             <div className="login-links">
-              <button type="button">아이디 찾기</button>
+              <button type="button" onClick={onFindId}>
+                아이디 찾기
+              </button>
               <span className="dot" aria-hidden="true" />
-              <button type="button">비밀번호 찾기</button>
+              <button type="button" onClick={onFindPw}>
+                비밀번호 찾기
+              </button>
             </div>
             <button type="submit" className="login-primary">
               로그인
@@ -126,8 +137,7 @@ export default function LoginApp({ onSignup }) {
             <div className="login-divider" />
             <div className="signup-row">
               <div className="signup-copy">
-                회원가입하고 <strong>BrandPliot</strong>의
-                <br></br>
+                회원가입하고 <strong>BrandPliot</strong>의<br></br>
                 <strong>더 많은 컨설팅</strong>를 받아보세요!
               </div>
               <button type="button" className="signup-cta" onClick={onSignup}>

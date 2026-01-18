@@ -1,5 +1,5 @@
 /* src/styles/SiteFooter.css */
-/* :root {
+:root {
   --navy: #001f66;
 }
 
@@ -48,7 +48,7 @@
 .siteFooter__copy {
   color: rgba(231, 236, 247, 0.82);
   font-weight: 700;
-} */
+}
 
 .site-footer {
   background: #001f66;

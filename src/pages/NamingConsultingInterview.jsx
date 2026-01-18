@@ -191,6 +191,10 @@ export default function NamingConsultingInterview({ onLogout }) {
   };
 
   const handleAnalyze = () => {
+    if (!canAnalyze) {
+      alert("필수 항목을 모두 입력하면 요청이 가능합니다.");
+      return;
+    }
     const payload = { form, updatedAt: Date.now() };
     localStorage.setItem("brandInterview_naming_v1", JSON.stringify(payload));
     navigate("/brand/result?service=naming");

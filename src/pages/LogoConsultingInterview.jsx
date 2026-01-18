@@ -195,6 +195,10 @@ export default function LogoConsultingInterview({ onLogout }) {
   };
 
   const handleAnalyze = () => {
+    if (!canAnalyze) {
+      alert("필수 항목을 모두 입력하면 요청이 가능합니다.");
+      return;
+    }
     const payload = {
       form, // 지금 페이지에서 관리 중인 입력값 객체
       updatedAt: Date.now(),

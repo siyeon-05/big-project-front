@@ -198,6 +198,10 @@ export default function HomepageConsultingInterview({ onLogout }) {
   };
 
   const handleAnalyze = () => {
+    if (!canAnalyze) {
+      alert("필수 항목을 모두 입력하면 요청이 가능합니다.");
+      return;
+    }
     const payload = { form, updatedAt: Date.now() };
     localStorage.setItem("brandInterview_homepage_v1", JSON.stringify(payload));
     navigate("/brand/result?service=homepage");

@@ -28,11 +28,8 @@ export default function FindPassword() {
     return "비밀번호 찾기";
   }, [step]);
 
-  const isEmailLike = useMemo(() => {
-    const v = userId.trim();
-    return v.includes("@") && v.includes(".");
-  }, [userId]);
-
+  // 2026-01-19
+  // email -> id
   const isPhoneLike = useMemo(() => {
     const onlyNum = phone.replace(/\D/g, "");
     return onlyNum.length >= 10 && onlyNum.length <= 11;
@@ -67,8 +64,9 @@ export default function FindPassword() {
     e.preventDefault();
     resetAlerts();
 
-    if (!userId.trim()) return setError("아이디(이메일)를 입력해주세요.");
-    if (!isEmailLike) return setError("아이디는 이메일 형식으로 입력해주세요.");
+    // 2026-01-19
+    // email -> id
+    if (!userId.trim()) return setError("아이디를 입력해주세요.");
     if (!phone.trim()) return setError("휴대폰 번호를 입력해주세요.");
     if (!isPhoneLike)
       return setError("휴대폰 번호는 숫자만 10~11자리로 입력해주세요.");
@@ -185,20 +183,24 @@ export default function FindPassword() {
         {message ? <p className="notice">{message}</p> : null}
         {error ? <p className="error">{error}</p> : null}
 
+        {/* 
+        2026-01-19
+        email -> id
+         */}
         {step === "request" && (
           <form className="findpw-form" onSubmit={handleRequest}>
             <div className="field">
-              <label htmlFor="findpw-id">아이디 (E-mail)</label>
+              <label htmlFor="findpw-id">아이디</label>
               <input
                 id="findpw-id"
-                type="email"
-                placeholder="이메일 아이디 입력"
+                type="text"
+                placeholder="아이디 입력"
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
-                autoComplete="email"
+                autoComplete="username"
               />
               <small className="helper">
-                회원가입한 이메일 주소를 입력해주세요.
+                회원가입한 아이디를 입력해주세요.
               </small>
             </div>
 

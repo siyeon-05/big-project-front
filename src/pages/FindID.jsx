@@ -10,7 +10,9 @@ export default function FindID() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
 
-  const [maskedEmail, setMaskedEmail] = useState("");
+  // 2025-01-19
+  // email -> id
+  const [maskedId, setMaskedId] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,17 +22,14 @@ export default function FindID() {
     return onlyNum.length >= 10 && onlyNum.length <= 11;
   }, [phone]);
 
-  const maskEmail = (email) => {
-    if (!email || !email.includes("@")) return "";
-    const [local, domain] = email.split("@");
-    if (!domain) return "";
-
-    if (local.length <= 1) return `*@${domain}`;
-    if (local.length === 2) return `${local[0]}*@${domain}`;
-
-    const keep = Math.min(2, local.length - 1);
-    const masked = `${local.slice(0, keep)}${"*".repeat(local.length - keep)}`;
-    return `${masked}@${domain}`;
+  // 2025-01-19
+  // email -> id
+  const maskId = (id) => {
+    if (!id) return "";
+    if (id.length <= 1) return "*";
+    if (id.length === 2) return `${id[0]}*`;
+    const keep = Math.min(2, id.length - 1);
+    return `${id.slice(0, keep)}${"*".repeat(id.length - keep)}`;
   };
 
   const resetAlerts = () => {
@@ -41,7 +40,9 @@ export default function FindID() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     resetAlerts();
-    setMaskedEmail("");
+  // 2025-01-19
+  // email 마스킹 -> id 마스킹
+    setMaskedId("");
 
     const safeName = name.trim();
     if (!safeName) return setError("이름을 입력해주세요.");
@@ -52,11 +53,13 @@ export default function FindID() {
     setLoading(true);
     try {
       // ✅ 실제 서비스라면 백엔드 API 호출로 교체
+      // 2025-01-19
+      // email -> id
       const phoneNormalized = phone.replace(/\D/g, "");
       const mockLocal = safeName.replace(/\s+/g, "").toLowerCase() || "user";
-      const mockEmail = `${mockLocal}${phoneNormalized.slice(-2)}@example.com`;
+      const mockId = `${mockLocal}${phoneNormalized.slice(-2)}`;
 
-      setMaskedEmail(maskEmail(mockEmail));
+      setMaskedId(maskId(mockId));
       setMessage("입력하신 정보로 가입된 아이디를 확인했습니다.");
     } catch {
       setError("아이디 조회에 실패했습니다. 잠시 후 다시 시도해주세요.");
@@ -65,7 +68,9 @@ export default function FindID() {
     }
   };
 
-  const locked = Boolean(maskedEmail); // ✅ 결과가 뜨면 입력 잠금(선택)
+  // 2025-01-19
+  // email -> id
+  const locked = Boolean(maskedId); // ✅ 결과가 뜨면 입력 잠금(선택)
 
   return (
     <div className="findid-page">
@@ -111,13 +116,17 @@ export default function FindID() {
           </div>
 
           {/* ✅ 결과 박스 */}
-          {maskedEmail ? (
+          {/* 
+          2026-01-19
+          email -> id
+          */}
+          {maskedId ? (
             <div className="resultBox" role="status" aria-live="polite">
               <div className="resultTop">
                 <span className="resultBadge">확인 완료</span>
                 <span className="resultLabel">확인된 아이디</span>
               </div>
-              <div className="resultValue">{maskedEmail}</div>
+              <div className="resultValue">{maskedId}</div>
               <div className="resultHint">
                 보안상 아이디는 일부 마스킹되어 표시됩니다.
               </div>
@@ -125,7 +134,7 @@ export default function FindID() {
           ) : null}
 
           {/* ✅ 핵심: 결과가 뜨면 확인 버튼 숨김 */}
-          {!maskedEmail ? (
+          {!maskedId ? (
             <button type="submit" className="primary" disabled={loading}>
               {loading ? "조회 중..." : "확인"}
             </button>

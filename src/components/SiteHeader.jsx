@@ -1,7 +1,10 @@
-// src/components/SiteHeader.jsx
+﻿// src/components/SiteHeader.jsx
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../styles/SiteHeader.css";
+// 2026-01-19
+// 토큰 import
+import { clearAccessToken } from "../api/client.js";
 
 export default function SiteHeader({ onLogout, onBrandPick, onPromoPick }) {
   const navigate = useNavigate();
@@ -153,10 +156,11 @@ export default function SiteHeader({ onLogout, onBrandPick, onPromoPick }) {
     const ok = window.confirm("로그아웃 하시겠습니까?");
     if (!ok) return;
 
-    setTimeout(() => {
-      if (typeof onLogout === "function") onLogout();
-      else navigate("/login");
-    }, 500);
+    // 2026-01-19
+    // 로그아웃 시 프론트 토큰 삭제, 로그인 이동
+    clearAccessToken();
+    if (typeof onLogout === "function") onLogout();
+    else navigate("/login");
   };
 
   return (
@@ -342,3 +346,5 @@ export default function SiteHeader({ onLogout, onBrandPick, onPromoPick }) {
     </header>
   );
 }
+
+

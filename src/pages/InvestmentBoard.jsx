@@ -8,6 +8,8 @@ import SiteFooter from "../components/SiteFooter.jsx";
 import PolicyModal from "../components/PolicyModal.jsx";
 import { PrivacyContent, TermsContent } from "../components/PolicyContents.jsx";
 
+const POSTS_STORAGE_KEY = "investmentPosts";
+
 export default function InvestmentBoard({ onLogout }) {
   const navigate = useNavigate();
 
@@ -98,18 +100,50 @@ export default function InvestmentBoard({ onLogout }) {
     ],
     []
   );
+  
+  const savedItems = useMemo(() => {
+    try {
+      const raw = localStorage.getItem(POSTS_STORAGE_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) return [];
+      return parsed.map((item, index) => ({
+        id: item.id || `local-${index}`,
+        name: item.company || "회사명",
+        oneLiner: item.oneLiner || "",
+        logoImageUrl: item.logoImageUrl || "",
+        tags: Array.isArray(item.hashtags)
+          ? item.hashtags.map((tag) => tag.trim()).filter(Boolean)
+          : [],
+        location: item.location || "",
+        companySize: item.companySize || "",
+        popularity: 0,
+        updatedAt: item.updatedAt || "2026-01-01",
+        kind: "preview",
+      }));
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
+  }, []);
+
+  const combinedItems = useMemo(
+    () => [...savedItems, ...items],
+    [items, savedItems]
+  );
 
   const filtered = useMemo(() => {
     const keyword = q.trim().toLowerCase();
 
-    let out = items.filter((it) => {
+    let out = combinedItems.filter((it) => {
       const hit =
         !keyword ||
         it.name.toLowerCase().includes(keyword) ||
         it.oneLiner.toLowerCase().includes(keyword) ||
         it.tags.join(" ").toLowerCase().includes(keyword);
 
-      const stageOk = stage === "all" ? true : it.stage === stage;
+      const stageOk =
+        stage === "all" ? true : it.kind === "preview" ? false : it.stage === stage;
       return hit && stageOk;
     });
 
@@ -120,7 +154,7 @@ export default function InvestmentBoard({ onLogout }) {
     }
 
     return out;
-  }, [items, q, stage, sort]);
+  }, [combinedItems, q, stage, sort]);
 
   const stageOptions = [
     "all",
@@ -174,7 +208,7 @@ export default function InvestmentBoard({ onLogout }) {
               <button
                 type="button"
                 className="btn"
-                onClick={() => alert("등록 기능 (준비중)")}
+                onClick={() => navigate("/investment/new")}
               >
                 게시글 등록
               </button>
@@ -230,52 +264,109 @@ export default function InvestmentBoard({ onLogout }) {
         </section>
 
         <section className="invest-grid" aria-label="투자유치 게시글 목록">
-          {filtered.map((it) => (
-            <article
-              key={it.id}
-              className="invest-card"
-              role="button"
-              tabIndex={0}
-              onClick={() => alert(`${it.name} 상세 페이지 (준비중)`)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ")
-                  alert(`${it.name} 상세 페이지 (준비중)`);
-              }}
-            >
-              <div className="invest-card-head">
-                <div className="invest-logo" aria-hidden="true">
-                  {it.name.slice(0, 2).toUpperCase()}
-                </div>
-                <div className="invest-head-text">
-                  <h3>{it.name}</h3>
-                  <p>{it.oneLiner}</p>
-                </div>
-              </div>
+          {filtered.map((it) => {
+            if (it.kind === "preview") {
+              const logoText = it.name.slice(0, 2).toUpperCase();
+              const locationText = [it.location, it.companySize]
+                .filter(Boolean)
+                .join(", ");
 
-              <div className="invest-meta">
-                <span className="pill">{it.stage}</span>
-                <span className="pill ghost">{it.location}</span>
-                <span
-                  className={`pill ${it.status === "투자 완료" ? "success" : "warning"}`}
+              return (
+                <article
+                  key={it.id}
+                  className="invest-preview invest-preview--board"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => navigate(`/investment/edit/${it.id}`)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ")
+                      navigate(`/investment/edit/${it.id}`);
+                  }}
                 >
-                  {it.status}
-                </span>
-              </div>
+                  <div className="invest-preview-top">
+                    <div className="invest-preview-text">
+                      <h3>{it.name}</h3>
+                      <p className="invest-preview-oneliner">
+                        {it.oneLiner || "한 줄 소개가 표시됩니다."}
+                      </p>
+                    </div>
+                    <div className="invest-preview-logo" aria-hidden="true">
+                      {it.logoImageUrl ? (
+                        <img src={it.logoImageUrl} alt="로고 미리보기" />
+                      ) : (
+                        logoText
+                      )}
+                    </div>
+                  </div>
+                  <div className="invest-preview-tags">
+                    {it.tags.length === 0 ? (
+                      <span className="empty">태그를 입력해 주세요.</span>
+                    ) : (
+                      it.tags.map((tag) => <span key={tag}>#{tag}</span>)
+                    )}
+                  </div>
+                  <div className="invest-preview-bottom">
+                    <div className="invest-preview-meta">
+                      <div className="invest-preview-status">{locationText}</div>
+                      <div className="invest-preview-updated">
+                        업데이트: {it.updatedAt}
+                      </div>
+                    </div>
+                    <span className="invest-preview-link" aria-hidden="true">
+                      ↗
+                    </span>
+                  </div>
+                </article>
+              );
+            }
 
-              <div className="invest-tags">
-                {it.tags.map((t) => (
-                  <span key={t}>#{t}</span>
-                ))}
-              </div>
+            return (
+              <article
+                key={it.id}
+                className="invest-card"
+                role="button"
+                tabIndex={0}
+                onClick={() => alert(`${it.name} 상세 페이지 (준비중)`)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ")
+                    alert(`${it.name} 상세 페이지 (준비중)`);
+                }}
+              >
+                <div className="invest-card-head">
+                  <div className="invest-logo" aria-hidden="true">
+                    {it.name.slice(0, 2).toUpperCase()}
+                  </div>
+                  <div className="invest-head-text">
+                    <h3>{it.name}</h3>
+                    <p>{it.oneLiner}</p>
+                  </div>
+                </div>
 
-              <div className="invest-footer">
-                <strong>{it.amount}</strong>
-                <span className="arrow">↗</span>
-              </div>
+                <div className="invest-meta">
+                  <span className="pill">{it.stage}</span>
+                  <span className="pill ghost">{it.location}</span>
+                  <span
+                    className={`pill ${it.status === "투자 완료" ? "success" : "warning"}`}
+                  >
+                    {it.status}
+                  </span>
+                </div>
 
-              <div className="invest-updated">업데이트: {it.updatedAt}</div>
-            </article>
-          ))}
+                <div className="invest-tags">
+                  {it.tags.map((t) => (
+                    <span key={t}>#{t}</span>
+                  ))}
+                </div>
+
+                <div className="invest-footer">
+                  <strong>{it.amount}</strong>
+                  <span className="arrow">↗</span>
+                </div>
+
+                <div className="invest-updated">업데이트: {it.updatedAt}</div>
+              </article>
+            );
+          })}
         </section>
       </main>
 

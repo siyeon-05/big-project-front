@@ -96,6 +96,10 @@ import PromotionResult from "./pages/PromotionResult.jsx";
 import BrandConsultingResult from "./pages/BrandConsultingResult.jsx";
 
 import InvestmentBoard from "./pages/InvestmentBoard.jsx";
+// 2026-01-20
+// 등록페이지, 수정페이지 추가
+import InvestmentPostEdit from "./pages/InvestmentPostEdit.jsx";
+import InvestmentPostCreate from "./pages/InvestmentPostCreate.jsx";
 
 export default function App() {
   return (
@@ -167,6 +171,12 @@ export default function App() {
       <Route path="/brand/result" element={<BrandConsultingResult />} />
 
       <Route path="/investment" element={<InvestmentBoard />} />
+      {/* 
+      2026-01-20
+      등록페이지, 수정페이지 추가
+      */}
+      <Route path="/investment/new" element={<InvestmentPostCreate />} />
+      <Route path="/investment/edit/:id" element={<InvestmentPostEdit />} />
 
       {/* ✅ 없는 경로는 메인으로 */}
       <Route path="*" element={<Navigate to="/main" replace />} />

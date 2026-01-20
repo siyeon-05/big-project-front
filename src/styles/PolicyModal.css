@@ -30,8 +30,8 @@
 /* ✅ 패널 */
 .policyModal__panel {
   position: relative;
-  width: min(860px, 92vw);
-  max-height: min(78vh, 720px);
+  width: min(640px, 90vw);
+  max-height: min(86vh, 860px);
   background: var(--panel);
   border-radius: 18px;
   border: 1px solid rgba(229, 231, 239, 0.9);

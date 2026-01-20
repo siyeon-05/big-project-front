@@ -79,6 +79,9 @@ import "./styles/PromotionResult.css";
 import "./styles/BrandConsultingResult.css";
 
 import "./styles/InvestmentBoard.css";
+// 2026-01-20
+// 등록, 수정 페이지 css 추가
+import "./styles/InvestmentPostCreate.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

@@ -1,0 +1,412 @@
+// src/pages/InvestmentPostCreate.jsx
+// 2026-01-20
+// 게시글 등록 페이지 구현
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+import SiteHeader from "../components/SiteHeader.jsx";
+import SiteFooter from "../components/SiteFooter.jsx";
+import PolicyModal from "../components/PolicyModal.jsx";
+import { PrivacyContent, TermsContent } from "../components/PolicyContents.jsx";
+
+const LOCATION_OPTIONS = ["서울", "경기", "인천", "대전", "대구", "부산", "광주"];
+const COMPANY_SIZE_OPTIONS = [
+  "예비 창업 / 개인",
+  "스타트업",
+  "중소기업",
+  "중견기업",
+  "대기업",
+];
+const DRAFT_STORAGE_KEY = "investmentPostDraft";
+const POSTS_STORAGE_KEY = "investmentPosts";
+
+export default function InvestmentPostCreate({ onLogout }) {
+  const navigate = useNavigate();
+
+  const [openType, setOpenType] = useState(null);
+  const closeModal = () => setOpenType(null);
+
+  const [form, setForm] = useState({
+    company: "",
+    oneLiner: "",
+    location: "서울",
+    companySize: "스타트업",
+    logoImageUrl: "",
+    hashtags: ["", "", "", "", ""],
+    website: "",
+    contactName: "",
+    contactEmail: "",
+    summary: "",
+  });
+  const [errors, setErrors] = useState({
+    logoImageUrl: "",
+    website: "",
+  });
+  const [draftPromptOpen, setDraftPromptOpen] = useState(false);
+  const [draftCandidate, setDraftCandidate] = useState(null);
+
+  const updateField = (key) => (event) => {
+    setForm((prev) => ({ ...prev, [key]: event.target.value }));
+  };
+
+  const validateUrl = (value) => {
+    if (!value) return "";
+    return value.startsWith("http://") || value.startsWith("https://")
+      ? ""
+      : "http:// 또는 https://로 시작해야 합니다.";
+  };
+
+  const handleUrlBlur = (key) => (event) => {
+    setErrors((prev) => ({ ...prev, [key]: validateUrl(event.target.value) }));
+  };
+  const tagList = useMemo(() => {
+    return form.hashtags.map((tag) => tag.trim()).filter(Boolean);
+  }, [form.hashtags]);
+
+  const previewLogo = (form.company || "회사").slice(0, 2).toUpperCase();
+  const logoSrc = form.logoImageUrl;
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const nextErrors = {
+      logoImageUrl: validateUrl(form.logoImageUrl),
+      website: validateUrl(form.website),
+    };
+    setErrors(nextErrors);
+    if (nextErrors.logoImageUrl || nextErrors.website) return;
+    const payload = {
+      id: `local-${Date.now()}`,
+      company: form.company,
+      oneLiner: form.oneLiner,
+      logoImageUrl: form.logoImageUrl,
+      hashtags: form.hashtags,
+      location: form.location,
+      companySize: form.companySize,
+      website: form.website,
+      contactName: form.contactName,
+      contactEmail: form.contactEmail,
+      summary: form.summary,
+      updatedAt: new Date().toISOString().slice(0, 10),
+    };
+
+    try {
+      const saved = localStorage.getItem(POSTS_STORAGE_KEY);
+      const list = saved ? JSON.parse(saved) : [];
+      const nextList = Array.isArray(list) ? [payload, ...list] : [payload];
+      localStorage.setItem(POSTS_STORAGE_KEY, JSON.stringify(nextList));
+      localStorage.removeItem(DRAFT_STORAGE_KEY);
+    } catch (error) {
+      console.error(error);
+    }
+
+    navigate("/investment");
+  };
+
+  const handleDraftSave = () => {
+    try {
+      localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(form));
+      alert("임시 저장되었습니다.");
+    } catch (error) {
+      console.error(error);
+      alert("임시 저장에 실패했습니다.");
+    }
+  };
+
+  const applyDraft = (draft) => {
+    setForm((prev) => ({
+      ...prev,
+      ...draft,
+      hashtags: Array.isArray(draft?.hashtags)
+        ? [...draft.hashtags, "", "", "", "", ""].slice(0, 5)
+        : prev.hashtags,
+    }));
+  };
+
+  const handleDraftLoad = () => {
+    if (!draftCandidate) return;
+    applyDraft(draftCandidate);
+    setDraftPromptOpen(false);
+  };
+
+  const handleDraftDiscard = () => {
+    try {
+      localStorage.removeItem(DRAFT_STORAGE_KEY);
+    } catch (error) {
+      console.error(error);
+    }
+    setDraftCandidate(null);
+    setDraftPromptOpen(false);
+  };
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(DRAFT_STORAGE_KEY);
+      if (!saved) return;
+      const parsed = JSON.parse(saved);
+      setDraftCandidate(parsed);
+      setDraftPromptOpen(true);
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
+  return (
+    <div className="invest-create-page">
+      <PolicyModal
+        open={openType === "privacy"}
+        title="개인정보 처리방침"
+        onClose={closeModal}
+      >
+        <PrivacyContent />
+      </PolicyModal>
+
+      <PolicyModal
+        open={openType === "terms"}
+        title="이용약관"
+        onClose={closeModal}
+      >
+        <TermsContent />
+      </PolicyModal>
+
+      <PolicyModal
+        open={draftPromptOpen}
+        title="임시 저장 불러오기"
+        onClose={() => setDraftPromptOpen(false)}
+      >
+        <p className="invest-draft-text">
+          임시 저장된 내용이 있습니다. 불러오시겠습니까?
+        </p>
+        <div className="invest-draft-actions">
+          <button type="button" className="btn ghost" onClick={handleDraftDiscard}>
+            삭제
+          </button>
+          <button type="button" className="btn" onClick={handleDraftLoad}>
+            불러오기
+          </button>
+        </div>
+      </PolicyModal>
+
+      <SiteHeader onLogout={onLogout} />
+
+      <main className="invest-create-main">
+        <section className="invest-create-hero">
+          <div>
+            <h1 className="invest-create-title">투자 게시글 등록</h1>
+            <p className="invest-create-sub">
+              투자 라운지에 공유할 기업 정보를 입력해 주세요.
+            </p>
+          </div>
+          <div className="invest-create-hero-actions">
+            <button
+              type="button"
+              className="btn ghost"
+              onClick={() => navigate("/investment")}
+            >
+              목록으로
+            </button>
+            <button type="button" className="btn primary">
+              미리보기
+            </button>
+          </div>
+        </section>
+
+        <section className="invest-create-grid">
+          <form
+            id="invest-create"
+            className="invest-create-card"
+            onSubmit={handleSubmit}
+          >
+            <div className="invest-form-row two-col">
+              <label className="invest-form-label">
+                회사명
+                <input
+                  type="text"
+                  value={form.company}
+                  onChange={updateField("company")}
+                  placeholder="브랜드 파일럿"
+                  required
+                />
+              </label>
+              <label className="invest-form-label">
+                한 줄 소개
+                <input
+                  type="text"
+                  value={form.oneLiner}
+                  onChange={updateField("oneLiner")}
+                  placeholder="예: AI 기반 B2B 영업 효율화 SaaS"
+                />
+              </label>
+            </div>
+
+            <div className="invest-form-row">
+              <label className="invest-form-label">
+                로고 이미지 URL
+                <input
+                  type="url"
+                  value={form.logoImageUrl}
+                  onChange={updateField("logoImageUrl")}
+                  onBlur={handleUrlBlur("logoImageUrl")}
+                  placeholder="https://"
+                />
+              </label>
+              {errors.logoImageUrl ? (
+                <div className="invest-form-error">{errors.logoImageUrl}</div>
+              ) : null}
+            </div>
+
+            <div className="invest-form-row two-col">
+              <label className="invest-form-label">
+                지역
+                <select value={form.location} onChange={updateField("location")}>
+                  {LOCATION_OPTIONS.map((loc) => (
+                    <option key={loc} value={loc}>
+                      {loc}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="invest-form-label">
+                회사 규모
+                <select
+                  value={form.companySize}
+                  onChange={updateField("companySize")}
+                >
+                  {COMPANY_SIZE_OPTIONS.map((size) => (
+                    <option key={size} value={size}>
+                      {size}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            <div className="invest-form-row">
+              <label className="invest-form-label">
+                태그 (최대 5개)
+                <div className="invest-tag-grid">
+                  {form.hashtags.map((value, index) => (
+                    <input
+                      key={`hashtag-${index}`}
+                      type="text"
+                      value={value}
+                      onChange={(event) => {
+                        const next = [...form.hashtags];
+                        next[index] = event.target.value;
+                        setForm((prev) => ({ ...prev, hashtags: next }));
+                      }}
+                      placeholder={`해시태그 ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              </label>
+            </div>
+
+            <div className="invest-form-row two-col">
+              <label className="invest-form-label">
+                공식 홈페이지
+                <input
+                  type="url"
+                  value={form.website}
+                  onChange={updateField("website")}
+                  onBlur={handleUrlBlur("website")}
+                  placeholder="https://"
+                />
+              </label>
+              <label className="invest-form-label">
+                담당자 이름
+                <input
+                  type="text"
+                  value={form.contactName}
+                  onChange={updateField("contactName")}
+                  placeholder="홍길동"
+                />
+              </label>
+            </div>
+            {errors.website ? (
+              <div className="invest-form-error">{errors.website}</div>
+            ) : null}
+
+            <div className="invest-form-row">
+              <label className="invest-form-label">
+                담당자 이메일
+                <input
+                  type="email"
+                  value={form.contactEmail}
+                  onChange={updateField("contactEmail")}
+                  placeholder="contact@brandpilot.kr"
+                />
+              </label>
+            </div>
+
+            <div className="invest-form-row">
+              <label className="invest-form-label">
+                상세 소개
+                <textarea
+                  value={form.summary}
+                  onChange={updateField("summary")}
+                  placeholder="사업 모델, traction, 지표 등 투자자가 바로 이해할 수 있도록 작성해 주세요."
+                  rows={5}
+                />
+              </label>
+            </div>
+
+            <div className="invest-form-actions">
+              <button type="button" className="btn ghost" onClick={handleDraftSave}>
+                임시 저장
+              </button>
+              <button type="submit" className="btn primary">
+                등록하기
+              </button>
+            </div>
+          </form>
+
+          <aside className="invest-create-side">
+            <div className="invest-preview">
+              <div className="invest-preview-top">
+                <div className="invest-preview-text">
+                  <h3>{form.company || "회사명 입력"}</h3>
+                  <p className="invest-preview-oneliner">
+                    {form.oneLiner || "한 줄 소개가 표시됩니다."}
+                  </p>
+                </div>
+                <div className="invest-preview-logo" aria-hidden="true">
+                  {logoSrc ? (
+                    <img src={logoSrc} alt="로고 미리보기" />
+                  ) : (
+                    previewLogo
+                  )}
+                </div>
+              </div>
+              <div className="invest-preview-tags">
+                {tagList.length === 0 ? (
+                  <span className="empty">태그를 입력해 주세요.</span>
+                ) : (
+                  tagList.map((tag) => <span key={tag}>#{tag}</span>)
+                )}
+              </div>
+              <div className="invest-preview-bottom">
+                <div className="invest-preview-status">
+                  {form.location}, {form.companySize}
+                </div>
+                <button type="button" className="invest-preview-link">
+                  ↗
+                </button>
+              </div>
+            </div>
+
+            <div className="invest-guide">
+              <h4>작성 가이드</h4>
+              <ul>
+                <li>회사명과 한 줄 소개는 투자자가 한눈에 이해할 수 있게 작성해 주세요.</li>
+                <li>태그는 핵심 키워드 위주로 최대 5개까지 입력해 주세요.</li>
+                <li>로고 이미지와 공식 홈페이지를 입력하면 게시글 완성도가 높아집니다.</li>
+              </ul>
+            </div>
+          </aside>
+        </section>
+      </main>
+
+      <SiteFooter onOpenPolicy={setOpenType} />
+    </div>
+  );
+}

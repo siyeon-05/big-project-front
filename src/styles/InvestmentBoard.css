@@ -139,6 +139,17 @@
   box-shadow: 0 16px 30px rgba(15, 23, 42, 0.1);
 }
 
+.invest-preview--board {
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.invest-preview--board:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.1);
+}
+
 .invest-card-head {
   display: flex;
   gap: 12px;
